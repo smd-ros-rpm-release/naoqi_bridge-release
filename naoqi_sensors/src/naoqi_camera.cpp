@@ -91,7 +91,6 @@ namespace naoqicamera_driver
                                    ros::NodeHandle camera_nh):
     NaoqiNode(argc, argv),
     state_(Driver::CLOSED),
-    reconfiguring_(false),
     priv_nh_(priv_nh),
     camera_nh_(camera_nh),
     camera_name_("camera"),
@@ -112,6 +111,7 @@ namespace naoqicamera_driver
                      &topic_diagnostics_max_freq_, 0.1, 10),
                 diagnostic_updater::TimeStampStatusParam())
   {
+    getNaoqiParams(priv_nh);
     if ( !connectNaoQi() )
     {
       ROS_ERROR("Could not connect to NAOqi! Make sure NAOqi is running and you passed the right host/port.");
@@ -122,6 +122,28 @@ namespace naoqicamera_driver
 
   NaoqiCameraDriver::~NaoqiCameraDriver()
   {}
+
+
+  /** Get broker ip and port from ROS parameters.
+   * @param nh Nodehandle used to get parameters
+   *
+   */
+  void NaoCameraDriver::getNaoqiParams(ros::NodeHandle nh)
+  {
+    if( !nh.getParam("pip", m_pip) )
+      ROS_WARN("No pip parameter specified.");
+    if( !nh.getParam("pport", m_pport) )
+      ROS_WARN("No pport parameter specified.");
+    if( !nh.getParam("ip", m_ip) )
+      ROS_DEBUG("No ip parameter specified.");
+    if( !nh.getParam("port", m_port) )
+      ROS_DEBUG("No port parameter specified.");
+
+    ROS_INFO_STREAM("pip: " << m_pip);
+    ROS_INFO_STREAM("pip: " << m_pport);
+    ROS_INFO_STREAM("ip:" << m_ip);
+    ROS_INFO_STREAM("port: " << m_port);
+  }
 
   /** Close camera device
    *
@@ -237,8 +259,9 @@ namespace naoqicamera_driver
             closeCamera();
         }
     }
-    else if (!reconfiguring_)
+    else
     {
+        boost::mutex::scoped_lock scopedLock(reconfiguration_mutex_);
         if (state_ == Driver::CLOSED)
         {
             openCamera(config_);        // open with current configuration
@@ -380,9 +403,8 @@ namespace naoqicamera_driver
    **/
   void NaoqiCameraDriver::reconfig(Config &newconfig, uint32_t level)
   {
-    // Do not run concurrently with poll().  Tell it to stop running,
-    // and wait on the lock until it does.
-    reconfiguring_ = true;
+    // Do not run concurrently with poll().
+    boost::mutex::scoped_lock scopedLock(reconfiguration_mutex_);
     ROS_DEBUG("dynamic reconfigure level 0x%x", level);
 
     // resolve frame ID using tf_prefix parameter
@@ -451,7 +473,7 @@ namespace naoqicamera_driver
 
         if (config_.saturation != newconfig.saturation)
             camera_proxy_->setParam(kCameraSaturationID, newconfig.saturation);
- 
+
         if (config_.hue != newconfig.hue)
             camera_proxy_->setParam(kCameraHueID, newconfig.hue);
 
@@ -470,8 +492,6 @@ namespace naoqicamera_driver
 
     config_ = newconfig;                // save new parameters
     real_frame_rate_ = ros::Rate(newconfig.frame_rate);
-
-    reconfiguring_ = false;             // let poll() run again
 
     ROS_DEBUG_STREAM("[" << camera_name_
                      << "] reconfigured: frame_id " << frame_id_

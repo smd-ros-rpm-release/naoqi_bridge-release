@@ -20,12 +20,12 @@ import rospy
 
 from octomap_msgs.msg import Octomap
 
-from nao_driver import NaoNode
-from nao_driver.boost.octomap_python import octomap_str_to_tuple
+from naoqi_driver.naoqi_node import NaoqiNode
+from naoqi_sensors.boost.octomap_python import octomap_str_to_tuple
 
-class NaoOctomap(NaoNode):
+class NaoqiOctomap(NaoqiNode):
     def __init__(self):
-        NaoNode.__init__(self, 'nao_octomap')
+        NaoqiNode.__init__(self, 'nao_octomap')
 
         if self.get_version() < LooseVersion('2.0'):
             rospy.loginfo('NAOqi version < 2.0, Octomap is not used')
@@ -35,7 +35,6 @@ class NaoOctomap(NaoNode):
         if proxy is None:
             rospy.loginfo('Could not get access to the ALNavigation proxy')
             exit(1)
-        proxy._setObstacleModeForSafety(1)
 
         # Create ROS publisher
         self.pub = rospy.Publisher("octomap", Octomap, latch = True, queue_size=1)
@@ -52,14 +51,13 @@ class NaoOctomap(NaoNode):
         while self.is_looping():
             octomap_bin = self.get_proxy("ALNavigation")._get3DMap()
             octomap.binary, octomap.id, octomap.resolution, octomap.data = octomap_str_to_tuple(octomap_bin)
-
-            octomap.header.stamp = rospy.Time.now()
-
-            self.pub.publish(octomap)
+            if len(octomap.data) > 0:
+                octomap.header.stamp = rospy.Time.now()
+                self.pub.publish(octomap)
 
             r.sleep()
 
 if __name__ == '__main__':
-    nao_octomap = NaoOctomap()
+    nao_octomap = NaoqiOctomap()
     nao_octomap.start()
     rospy.spin()

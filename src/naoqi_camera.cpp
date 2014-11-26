@@ -112,12 +112,22 @@ namespace naoqicamera_driver
                 diagnostic_updater::TimeStampStatusParam())
   {
     getNaoqiParams(priv_nh);
-    if ( !connectNaoQi() )
+    
+    if ( connectNaoQi() )
     {
-      ROS_ERROR("Could not connect to NAOqi! Make sure NAOqi is running and you passed the right host/port.");
-      throw naoqicamera_driver::Exception("Connection to NAOqi failed");
+      ROS_DEBUG("Connected to remote NAOqi.");
+      return;
     }
 
+    ROS_WARN("Could not connect to remote NAOqi! Trying to connect to local NAOqi.");
+
+    if ( connectLocalNaoQi() )
+    {
+      ROS_DEBUG("Connected to local NAOqi.");
+      return;
+    }
+
+    throw naoqicamera_driver::Exception("Connection to NAOqi failed");
   }
 
   NaoqiCameraDriver::~NaoqiCameraDriver()
@@ -128,7 +138,7 @@ namespace naoqicamera_driver
    * @param nh Nodehandle used to get parameters
    *
    */
-  void NaoCameraDriver::getNaoqiParams(ros::NodeHandle nh)
+  void NaoqiCameraDriver::getNaoqiParams(ros::NodeHandle nh)
   {
     if( !nh.getParam("pip", m_pip) )
       ROS_WARN("No pip parameter specified.");

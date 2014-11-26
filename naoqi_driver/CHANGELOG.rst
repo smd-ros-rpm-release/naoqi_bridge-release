@@ -2,6 +2,25 @@
 Changelog for package naoqi_driver
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.4.2 (2014-11-26)
+------------------
+* update changelogs
+* Fix SDK dependencies (did not compile in C++ with every SDK versions)
+* Added support for connecting to local broker
+  By doing this the nodelet can connect to a local broker allowing
+  direct function calls and memory access.
+  Note that the nodelet will prefer the local broker over one
+  specified on the command line or using ros parameters.
+* Contributors: Jon Dybeck, Vincent Rabaud, sambrose
+
+* Fix SDK dependencies (did not compile in C++ with every SDK versions)
+* Added support for connecting to local broker
+  By doing this the nodelet can connect to a local broker allowing
+  direct function calls and memory access.
+  Note that the nodelet will prefer the local broker over one
+  specified on the command line or using ros parameters.
+* Contributors: Jon Dybeck, sambrose
+
 0.4.1 (2014-11-13)
 ------------------
 * added speech dynamic reconfigure

@@ -1,0 +1,34 @@
+ros-hydro-naoqi-tools (0.4.2-0precise) precise; urgency=high
+
+  * remove useless dependency
+  * Remove suffix _joint for all joints
+  * get package version to agree
+  * add changelogs
+  * fix module dependency to comply new git organization
+  * update file according to comments of vrabaud
+  * changed actuator frames naming convention
+  * Update README.rst
+  * add urdf parsing libs and generation script
+  * Contributors: Arguedas Mikael, Mikael ARGUEDAS, Vincent Rabaud, margueda
+  * fix module dependency to comply new git organization
+  * update file according to comments of vrabaud
+  * changed actuator frames naming convention
+  * Update README.rst
+  * add urdf parsing libs and generation script
+  * Contributors: Arguedas Mikael, Mikael ARGUEDAS, margueda
+
+ -- Mikael Arguedas <mikael.arguedas@gmail.com>  Tue, 25 Nov 2014 23:00:00 -0000
+
+ros-hydro-naoqi-tools (0.4.1-0precise) precise; urgency=high
+
+
+
+ -- Mikael Arguedas <mikael.arguedas@gmail.com>  Wed, 12 Nov 2014 23:00:00 -0000
+
+ros-hydro-naoqi-tools (0.4.0-0precise) precise; urgency=high
+
+
+
+ -- Mikael Arguedas <mikael.arguedas@gmail.com>  Wed, 05 Nov 2014 23:00:00 -0000
+
+

@@ -2,6 +2,11 @@
 Changelog for package naoqi_msgs
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.4.2 (2014-11-26)
+------------------
+* update changelogs
+* Contributors: Vincent Rabaud
+
 0.4.1 (2014-11-13)
 ------------------
 * fixing imports on microphone sensor

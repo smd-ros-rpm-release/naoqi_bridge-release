@@ -1,0 +1,25 @@
+ros-hydro-naoqi-msgs (0.4.2-0raring) raring; urgency=high
+
+  * update changelogs
+  * Contributors: Vincent Rabaud
+
+ -- Severin Lemaignan <severin.lemaignan@epfl.ch>  Tue, 25 Nov 2014 23:00:00 -0000
+
+ros-hydro-naoqi-msgs (0.4.1-0raring) raring; urgency=high
+
+  * fixing imports on microphone sensor
+  * fixing imports on microphone sensor
+  * Contributors: Karsten Knese
+
+ -- Severin Lemaignan <severin.lemaignan@epfl.ch>  Wed, 12 Nov 2014 23:00:00 -0000
+
+ros-hydro-naoqi-msgs (0.4.0-0raring) raring; urgency=high
+
+  * introduce replace tag in package.xml
+  * naoqi_msgs transfer
+  * renamed subfolders for naoqi_*
+  * Contributors: Karsten Knese
+
+ -- Severin Lemaignan <severin.lemaignan@epfl.ch>  Wed, 05 Nov 2014 23:00:00 -0000
+
+

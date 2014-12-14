@@ -111,14 +111,28 @@ class NaoqiCam (NaoqiNode):
         #load calibration files
         if rospy.has_param('~calibration_file_top'):
             self.config['calibration_file_top'] = rospy.get_param('~calibration_file_top')
+        else:
+            rospy.loginfo('no camera calibration for top camera found')
+
         if rospy.has_param('~calibration_file_bottom'):
             self.config['calibration_file_bottom'] = rospy.get_param('~calibration_file_bottom')
+        else:
+            rospy.loginfo('no camera calibration for bottom camera found')
 
+        # set time reference
         if rospy.has_param('~use_ros_time'):
             self.config['use_ros_time'] = rospy.get_param('~use_ros_time')
         else:
             self.config['use_ros_time'] = False
 
+
+    def load_camera_info( self ):
+        if self.config['source'] == 0:
+            self.config['camera_info_url'] = self.config['calibration_file_top']
+        elif self.config['source'] == 1:
+            self.config['camera_info_url'] = self.config['calibration_file_bottom']
+        else:
+            rospy.loginfo('no valid camera calibration file found')
 
     def reconfigure( self, new_config, level ):
         """
@@ -135,14 +149,9 @@ class NaoqiCam (NaoqiNode):
 
         if is_camera_new:
             rospy.loginfo('subscribed to camera proxy, since this is the first camera')
-            if self.get_version() < LooseVersion('2.0'):
-                self.nameId = self.camProxy.subscribe("rospy_gvm", new_config['source'],
-                                                      new_config['resolution'], new_config['color_space'],
-                                                      new_config['frame_rate'])
-            else:
-                self.nameId = self.camProxy.subscribeCamera("rospy_gvm", new_config['source'],
-                                                            new_config['resolution'], new_config['color_space'],
-                                                            new_config['frame_rate'])
+            self.nameId = self.camProxy.subscribeCamera("rospy_gvm", new_config['source'],
+                                                        new_config['resolution'], new_config['color_space'],
+                                                        new_config['frame_rate'])
 
         if self.config['source'] != new_config['source'] or is_camera_new:
             rospy.loginfo('updating camera source information')
@@ -158,8 +167,12 @@ class NaoqiCam (NaoqiNode):
                 exit(1)
 
         # check if the camera changed
-        if self.config['camera_info_url'] != new_config['camera_info_url'] and \
-                        new_config['camera_info_url'] and new_config['camera_info_url'] not in self.camera_infos:
+        if self.config['camera_info_url'] == "" or \
+           ( self.config['camera_info_url'] != new_config['camera_info_url'] and \
+           new_config['camera_info_url'] not in self.camera_infos ):
+
+            self.load_camera_info()
+
             if 'cim' not in self.__dict__:
                 self.cim = camera_info_manager.CameraInfoManager(cname='nao_camera')
 
@@ -257,7 +270,7 @@ class NaoqiCam (NaoqiNode):
             elif image[3] == kYUV422ColorSpace:
                 encoding = "yuv422" # this works only in ROS groovy and later
             elif image[3] == kDepthColorSpace:
-                encoding = "mono16"
+                encoding = "16UC1"
             else:
                 rospy.logerr("Received unknown encoding: {0}".format(image[3]))
             img.encoding = encoding

@@ -1,6 +1,6 @@
 <package>
   <name>naoqi_driver</name>
-  <version>0.4.2</version>
+  <version>0.4.3</version>
   <description>
     <p>
       Driver package for the Naoqi robot, providing access to walking commands,
@@ -59,7 +59,7 @@
   <run_depend>nav_msgs</run_depend>
   <run_depend>dynamic_reconfigure</run_depend>
 
-  <replace>nao_driver</replace>
+  <conflict>nao_driver</conflict>
 
   <export>
     <diagnostic_aggregator plugin="${prefix}/naoqi_analyzer_plugins.xml" />
